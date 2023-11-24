@@ -6,9 +6,9 @@ import json
 import sys
 import tiktoken
 import openai
+import os
 
-
-LLAMA_URL = "http://150.214.203.88:8000/v1/chat/completions"
+LLAMA_URL = os.getenv('LLAMA_URL')
 
 
 def clean_text(text):
@@ -64,9 +64,8 @@ def get_prompt(text):
     return prompt_txt
 
 
-
 def query_llama2(prompt_txt, url=LLAMA_URL, model="/projects/llama.cpp/models/nous-hermes-llama2-13b.Q8_0.gguf",
-                temperature=0, max_tokens=2048):
+                 temperature=0, max_tokens=2048):
     headers = {
         "Content-Type": "application/json",
     }
@@ -106,8 +105,8 @@ def adjust_num_tokens(text_prompt, max_tokens=2048):
 
     cnt_phrases = 0
     for phrase in phrases:
-        tokens_actual += num_tokens(phrase) + cnt_phrases*2  # join char size: '. '
-        #print(f'{tokens_actual}')
+        tokens_actual += num_tokens(phrase) + cnt_phrases * 2  # join char size: '. '
+        # print(f'{tokens_actual}')
 
         if tokens_actual <= max_tokens:
             cut_phrases.append(phrase)
@@ -119,14 +118,15 @@ def adjust_num_tokens(text_prompt, max_tokens=2048):
 
 
 def query_chatgpt3_5(prompt_txt, model="gpt-3.5-turbo",
-        question="",
-        max_len=2048,
-        debug=False, max_tokens=4096, stop_sequence=None,
-):
+                     question="",
+                     max_len=2048,
+                     debug=False, max_tokens=4096, stop_sequence=None,
+                     ):
     # TODO max_tokens
     try:
         messages = [
-            {"role": "system", "content": "You are a helpful conversational assitant that will maintain conversations in Spanish."},
+            {"role": "system",
+             "content": "You are a helpful conversational assitant that will maintain conversations in Spanish."},
             {"role": "user", "content": prompt_txt}
         ]
 
